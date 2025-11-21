@@ -28,12 +28,33 @@
       >
         Clear Message
       </button>
+      <button 
+  id="backButton" 
+  class="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-800 rounded-lg font-medium transition-colors" 
+>
+  Back to Admin
+</button>
+
     </div>
     <!-- Optional Blink Toggle -->
     <label class="flex items-center space-x-2">
       <input type="checkbox" id="blinkToggle" class="rounded">
       <span class="text-sm text-gray-300">Enable Blink Mode</span>
     </label>
+    <!-- Display Position -->
+    <div class="space-y-2">
+      <label class="text-sm text-gray-300">Display Position:</label>
+      <div class="flex gap-4">
+        <label class="flex items-center space-x-2">
+          <input type="radio" name="messagePosition" id="positionFull" value="full" checked class="rounded">
+          <span class="text-sm text-gray-300">Full Screen</span>
+        </label>
+        <label class="flex items-center space-x-2">
+          <input type="radio" name="messagePosition" id="positionCorner" value="corner" class="rounded">
+          <span class="text-sm text-gray-300">Left Corner</span>
+        </label>
+      </div>
+    </div>
     <p class="text-xs text-gray-400 text-center">Changes save to localStorage and update the display page automatically.</p>
   </div>
 
@@ -65,10 +86,12 @@
       const state = loadState();
       const messageText = getEl('messageInput').value.trim();
       const blinkEnabled = getEl('blinkToggle').checked;
+      const position = getEl('positionFull').checked ? 'full' : 'corner';
       
       state.message = {
         text: messageText,
-        blink: blinkEnabled
+        blink: blinkEnabled,
+        position: position
       };
       
       saveState(state);
@@ -77,6 +100,10 @@
       setTimeout(() => {
         getEl('displayBtn').textContent = 'Display on Scoreboard';
       }, 1000);
+    });
+
+    getEl('backButton').addEventListener('click', () => {
+      window.location.href = "index.html";
     });
 
     // Event listener for Clear button
@@ -99,6 +126,11 @@
       if (state.message) {
         getEl('messageInput').value = state.message.text || '';
         getEl('blinkToggle').checked = state.message.blink || false;
+        if (state.message.position === 'corner') {
+          getEl('positionCorner').checked = true;
+        } else {
+          getEl('positionFull').checked = true;
+        }
       }
     };
 
