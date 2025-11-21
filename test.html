@@ -791,6 +791,8 @@ SEttings.html file
             </div>
             <div class="mt-3">
                 <button id="applyPresets" class="px-3 py-2 rounded bg-[#3B82F6]">Apply</button>
+                 <button id="backButton" class="px-3 py-2 rounded bg-slate-700">Back</button>
+
             </div>
         </div>
 
@@ -828,7 +830,9 @@ SEttings.html file
                 st.teamA.name = qs('presetA').value; st.teamB.name = qs('presetB').value;
                 save(st); alert('Applied teams.');
             });
-
+        qs('backButton').addEventListener('click', () => {
+            window.location.href = "index.html";
+            });
             qs('applyPos').addEventListener('click', () => {
                 const st = load();
                 st.position = { x: parseInt(qs('posX').value) || 0, y: parseInt(qs('posY').value) || 0 };
