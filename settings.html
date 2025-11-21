@@ -71,10 +71,17 @@
             function load() { try { return JSON.parse(localStorage.getItem('scoreboardState')) || {}; } catch (e) { return {}; } }
             function save(s) { localStorage.setItem('scoreboardState', JSON.stringify(s)); }
 
+            const st = load();
+            qs('presetA').value = st.teamA?.name || '';
+            qs('presetB').value = st.teamB?.name || '';
+            qs('posX').value = st.position?.x || 0;
+            qs('posY').value = st.position?.y || 0;
+
             qs('applyPresets').addEventListener('click', () => {
                 const st = load(); st.teamA = st.teamA || {}; st.teamB = st.teamB || {};
                 st.teamA.name = qs('presetA').value;
                 st.teamB.name = qs('presetB').value;
+                st.lastUpdated = Date.now();
                 save(st); alert('Applied teams.');
             });
             qs('backButton').addEventListener('click', () => {
@@ -83,17 +90,21 @@
             qs('applyPos').addEventListener('click', () => {
                 const st = load();
                 st.position = { x: parseInt(qs('posX').value) || 0, y: parseInt(qs('posY').value) || 0 };
+                st.lastUpdated = Date.now();
                 save(st); alert('Position saved.');
             });
 
             qs('saveSettings').addEventListener('click', () => {
-                const st = load(); st.settingsSaved = true; save(st); alert('Settings saved.');
+                const st = load(); st.settingsSaved = true; st.lastUpdated = Date.now(); save(st); alert('Settings saved.');
             });
 
             qs('resetAll').addEventListener('click', () => {
                 if (!confirm('Reset entire scoreboard (all data)?')) return;
-                localStorage.removeItem('scoreboardState'); alert('Reset done.');
+                localStorage.removeItem('scoreboardState'); 
+                alert('Reset done.');
+                location.reload(); 
             });
+
 
         })();
     </script>
