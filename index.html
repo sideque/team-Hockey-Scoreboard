@@ -1,8 +1,13 @@
 <!doctype html>
 <html lang="en">
+<style>
+    .hide {
+        display: none !important;
+    }
+</style>
 
 <head>
-   
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Hockey Scoreboard — Admin</title>
@@ -115,9 +120,8 @@
                 </div>
                 <div class="p-4 bg-[#0b0c10] rounded-lg">
                     <h3 class="text-sm text-gray-300 mb-2">Shootout</h3>
-                    <div class="flex gap-2">
-                        <a href="shootout.html" target="_blank" class="px-3 py-2 rounded bg-[#3B82F6]">Open Shootout
-                            Page</a>
+                        <div class="flex gap-2">
+                      <button id="openShootoutBtn" target="_blank" class="px-3 py-2 rounded bg-[#3B82F6]">Open Shootout</button>
                         <button id="resetShootout" class="px-3 py-2 rounded bg-[#ef4444]">Reset Shootout</button>
                         <button id="openDisplay" class="ml-auto px-3 py-2 rounded bg-[#6EE7B7] text-black">Open
                             Display</button>
@@ -370,6 +374,9 @@
             // auto save from admin UI every 1s to ensure changes persist
             setInterval(() => saveState(state), 1000);
         })();
+
+
+
     </script>
 </body>
 </html>
