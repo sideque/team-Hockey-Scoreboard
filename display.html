@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hockey Scoreboard — Display</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    body {
+      background: linear-gradient(180deg, #0F1117, #0B0C10);
+      color: #fff;
+    }
+
+    .led {
+      font-family: ui-monospace, "Roboto Mono", monospace;
+      letter-spacing: .08em;
+      text-shadow: 0 0 10px rgba(59, 130, 246, 0.9), 0 0 28px rgba(59, 130, 246, 0.25);
+    }
+
+    .big-timer {
+      font-size: clamp(48px, 8vw, 128px);
+    }
+
+    .teamName {
+      font-size: clamp(16px, 2vw, 28px);
+      font-weight: 600;
+      letter-spacing: .06em;
+    }
+
+    .referral {
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .msgBox {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      max-width: 40%;
+      font-size: clamp(12px, 1.4vw, 22px);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen relative">
+
+  <div class="msgBox text-left text-white/90" id="messageBox"></div>
+
+  <div class="max-w-7xl mx-auto py-8 px-4">
+    <!-- <div class="w-full mb-6">
+      <iframe id="liveVideo" width="100%" height="360" class="rounded-lg shadow-lg"
+        src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1" allow="autoplay; encrypted-media"
+        allowfullscreen>
+      </iframe>
+    </div> -->
+
+    <div class="grid grid-cols-12 gap-6 items-center">
+      <!-- Team A -->
+      <div class="col-span-3 bg-transparent text-left">
+        <div id="displayTeamAName" class="teamName">TEAM A</div>
+        <div id="displayTeamAScore" class="text-7xl led font-black mt-4">00</div>
+        <div id="displayReferralA" class="mt-4 referral bg-green-600 text-black">Referral</div>
+      </div>
+
+      <!-- Center Timer -->
+      <div class="col-span-6 text-center">
+        <div id="displayQuarter" class="text-sm text-gray-400 mb-2">1st Quarter</div>
+        <div id="displayMainClock" class="big-timer led font-extrabold">15:00</div>
+        <div class="mt-4 flex justify-center gap-6">
+          <div class="text-center">
+            <div class="text-xs text-gray-400">Goal Timer</div>
+            <div id="displayGoal" class="led text-2xl">00:20</div>
+          </div>
+          <div class="text-center">
+            <div class="text-xs text-gray-400">Penalty Timer</div>
+            <div id="displayPenalty" class="led text-2xl">00:40</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team B -->
+      <div class="col-span-3 text-right">
+        <div id="displayTeamBName" class="teamName">TEAM B</div>
+        <div id="displayTeamBScore" class="text-7xl led font-black mt-4">00</div>
+        <div id="displayReferralB" class="mt-4 referral bg-green-600 text-black">Referral</div>
+      </div>
+    </div>
+
+    <!-- Shootout preview -->
+    <div class="mt-8 bg-[#081226] p-4 rounded-lg">
+      <div class="flex items-center justify-between">
+        <div class="text-gray-400">Shootout</div>
+        <div class="text-white led" id="displaySOScore">0 - 0</div>
+      </div>
+
+      <div id="soGrid" class="mt-4 grid grid-cols-11 gap-2 items-center">
+        <!-- layout: label, 5 A cells, separator, 5 B cells -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const qs = id => document.getElementById(id);
+      function loadState() { try { return JSON.parse(localStorage.getItem('scoreboardState')) || {}; } catch (e) { return {}; } }
+      function formatTime(s) { const m = Math.floor(s / 60), sec = s % 60; return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`; }
+
+      // track previous values to avoid re-render
+      let prev = {};
+
+      function render() {
+        const st = loadState();
+        if (!st.teamA) return;
+        // Team names
+        if (prev.teamAName !== st.teamA.name) {
+          qs('displayTeamAName').textContent = st.teamA.name || '';
+          prev.teamAName = st.teamA.name;
+        }
+        if (prev.teamBName !== st.teamB.name) {
+          qs('displayTeamBName').textContent = st.teamB.name || '';
+          prev.teamBName = st.teamB.name;
+        }
+
+        // Scores
+        if (prev.scoreA !== st.teamA.score) {
+          qs('displayTeamAScore').textContent = String(st.teamA.score || 0).padStart(2, '0');
+          prev.scoreA = st.teamA.score;
+        }
+        if (prev.scoreB !== st.teamB.score) {
+          qs('displayTeamBScore').textContent = String(st.teamB.score || 0).padStart(2, '0');
+          prev.scoreB = st.teamB.score;
+        }
+
+        // Colors & referral
+        if (prev.colorA !== st.teamA.color) {
+          qs('displayTeamAScore').style.color = st.teamA.color || '#fff';
+          prev.colorA = st.teamA.color;
+        }
+        if (prev.colorB !== st.teamB.color) {
+          qs('displayTeamBScore').style.color = st.teamB.color || '#fff';
+          prev.colorB = st.teamB.color;
+        }
+        if (prev.refA !== st.teamA.referral) {
+          qs('displayReferralA').textContent = st.teamA.referral ? 'Referral' : 'No Referral';
+          qs('displayReferralA').className = (st.teamA.referral ? 'referral bg-green-400 text-black' : 'referral bg-red-600 text-white');
+          prev.refA = st.teamA.referral;
+        }
+        if (prev.refB !== st.teamB.referral) {
+          qs('displayReferralB').textContent = st.teamB.referral ? 'Referral' : 'No Referral';
+          qs('displayReferralB').className = (st.teamB.referral ? 'referral bg-green-400 text-black' : 'referral bg-red-600 text-white');
+          prev.refB = st.teamB.referral;
+        }
+
+        // main clock
+        if (prev.main !== st.mainTimer.seconds) {
+          qs('displayMainClock').textContent = formatTime(st.mainTimer.seconds || 0);
+          prev.main = st.mainTimer.seconds;
+        }
+
+        // quarter label
+        if (prev.quarter !== st.quarter) {
+          const qlbl = (st.quarter || 1) + ((st.quarter == 1) ? 'st' : (st.quarter == 2 ? 'nd' : (st.quarter == 3 ? 'rd' : 'th'))) + ' Quarter';
+          qs('displayQuarter').textContent = qlbl;
+          prev.quarter = st.quarter;
+        }
+
+        // goal / penalty
+        if (prev.goal !== st.goalTimer.seconds) {
+          qs('displayGoal').textContent = formatTime(st.goalTimer.seconds || 0);
+          prev.goal = st.goalTimer.seconds;
+        }
+        if (prev.penalty !== st.penaltyTimer.seconds) {
+          qs('displayPenalty').textContent = formatTime(st.penaltyTimer.seconds || 0);
+          prev.penalty = st.penaltyTimer.seconds;
+        }
+
+        // message
+        if (prev.msg !== st.message.text) {
+          qs('messageBox').textContent = st.message.text || '';
+          prev.msg = st.message.text;
+        }
+
+        // shootout grid
+        const so = st.shootout || { rounds: [] };
+        const soGrid = qs('soGrid');
+        // only rebuild if changed length/rounds
+        if (JSON.stringify(prev.so) !== JSON.stringify(so)) {
+          prev.so = JSON.parse(JSON.stringify(so));
+          soGrid.innerHTML = '';
+          // labels
+          const label = document.createElement('div'); label.className = 'text-gray-400 col-span-1'; label.textContent = 'Rounds'; soGrid.appendChild(label);
+          // A cells
+          for (let i = 0; i < 5; i++) {
+            const c = document.createElement('div'); c.className = 'col-span-1 text-center py-1';
+            c.innerHTML = `<div class="text-sm text-gray-300">A${i + 1}</div><div class="text-2xl led">${so.rounds[i] ? (so.rounds[i].a || '-') : '-'}</div>`;
+            soGrid.appendChild(c);
+          }
+          // separator
+          const sep = document.createElement('div'); sep.className = 'col-span-1 text-center text-gray-400'; sep.textContent = 'vs'; soGrid.appendChild(sep);
+          // B cells
+          for (let i = 0; i < 5; i++) {
+            const c = document.createElement('div'); c.className = 'col-span-1 text-center py-1';
+            c.innerHTML = `<div class="text-sm text-gray-300">B${i + 1}</div><div class="text-2xl led">${so.rounds[i] ? (so.rounds[i].b || '-') : '-'}</div>`;
+            soGrid.appendChild(c);
+          }
+        }
+
+        // shootout score display
+        const scoreA = (st.shootout && st.shootout.scoreA) || 0;
+        const scoreB = (st.shootout && st.shootout.scoreB) || 0;
+        if (prev.soScore !== `${scoreA}-${scoreB}`) {
+          qs('displaySOScore').textContent = `${scoreA} - ${scoreB}`;
+          prev.soScore = `${scoreA}-${scoreB}`;
+        }
+      }
+
+      // poll localStorage every 250ms (lightweight) and only update differences
+      setInterval(render, 250);
+
+      // initial
+      render();
+
+    })();
+  </script>
+</body>
+
+</html>

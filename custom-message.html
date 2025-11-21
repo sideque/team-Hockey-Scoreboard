@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Custom Message</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-[#071025] text-white p-6">
+  <div class="max-w-xl mx-auto">
+    <h1 class="text-xl font-semibold mb-4">Custom Message</h1>
+    <textarea id="msg" rows="4" class="w-full p-3 rounded bg-[#0f1724]"></textarea>
+    <div class="mt-4 flex gap-3">
+      <button id="showBtn" class="px-3 py-2 rounded bg-[#3B82F6]">Display on Scoreboard</button>
+      <button id="clearBtn" class="px-3 py-2 rounded bg-red-600">Clear Message</button>
+      <button id="blinkBtn" class="ml-auto px-3 py-2 rounded bg-slate-700">Test Blink</button>
+    </div>
+    <p class="mt-4 text-gray-400 text-sm">Message will be displayed top left on the Display page.</p>
+  </div>
+
+<script>
+(function(){
+  const qs = id => document.getElementById(id);
+  function load(){ try{ return JSON.parse(localStorage.getItem('scoreboardState'))|| {}; }catch(e){ return {}; } }
+  function save(st){ localStorage.setItem('scoreboardState', JSON.stringify(st)); }
+
+  qs('showBtn').addEventListener('click', ()=>{
+    const st = load();
+    st.message = { text: qs('msg').value || '' };
+    save(st);
+    alert('Message updated.');
+  });
+
+  qs('clearBtn').addEventListener('click', ()=> {
+    const st = load(); st.message = { text: '' }; save(st); qs('msg').value='';
+    alert('Message cleared.');
+  });
+
+  qs('blinkBtn').addEventListener('click', ()=>{
+    // small visual test: toggle message briefly
+    const st = load(); const previous = st.message ? st.message.text : '';
+    st.message = { text: '*** HOOKER TEST ***' }; save(st);
+    setTimeout(()=> { st.message = { text: previous }; save(st); }, 1200);
+  });
+
+})();
+</script>
+</body>
+</html>
