@@ -1202,13 +1202,17 @@ SEttings.html file ------------------
     <div class="max-w-3xl mx-auto">
       <h1 class="text-xl font-semibold mb-4">Settings</h1>
 
-      <div class="mb-4">
-        <label class="text-sm text-gray-300"
-          >Preset Teams (choose for left/right)</label
-        >
-        <div class="grid grid-cols-2 gap-2 mt-2">
-          <select id="presetA" class="p-2 bg-[#0f1724] rounded"></select>
-          <select id="presetB" class="p-2 bg-[#0f1724] rounded"></select>
+        <div class="mb-4">
+            <label class="text-sm text-gray-300">Preset Teams (choose for left/right)</label>
+            <div class="grid grid-cols-2 gap-2 mt-2">
+                <select id="presetA" class="p-2 bg-[#0f1724] rounded"></select>
+                <select id="presetB" class="p-2 bg-[#0f1724] rounded"></select>
+            </div>
+            <div class="mt-3">
+                <button id="applyPresets" class="px-3 py-2 rounded bg-[#3B82F6]">Apply</button>
+                 <button id="backButton" class="px-3 py-2 rounded bg-slate-700">Back</button>
+
+            </div>
         </div>
         <div class="mt-3">
           <button id="applyPresets" class="px-3 py-2 rounded bg-[#3B82F6]">
@@ -1298,25 +1302,19 @@ SEttings.html file ------------------
           localStorage.setItem("scoreboardState", JSON.stringify(s));
         }
 
-        qs("applyPresets").addEventListener("click", () => {
-          const st = load();
-          st.teamA = st.teamA || {};
-          st.teamB = st.teamB || {};
-          st.teamA.name = qs("presetA").value;
-          st.teamB.name = qs("presetB").value;
-          save(st);
-          alert("Applied teams.");
-        });
-
-        qs("applyPos").addEventListener("click", () => {
-          const st = load();
-          st.position = {
-            x: parseInt(qs("posX").value) || 0,
-            y: parseInt(qs("posY").value) || 0,
-          };
-          save(st);
-          alert("Position saved.");
-        });
+            qs('applyPresets').addEventListener('click', () => {
+                const st = load(); st.teamA = st.teamA || {}; st.teamB = st.teamB || {};
+                st.teamA.name = qs('presetA').value; st.teamB.name = qs('presetB').value;
+                save(st); alert('Applied teams.');
+            });
+        qs('backButton').addEventListener('click', () => {
+            window.location.href = "index.html";
+            });
+            qs('applyPos').addEventListener('click', () => {
+                const st = load();
+                st.position = { x: parseInt(qs('posX').value) || 0, y: parseInt(qs('posY').value) || 0 };
+                save(st); alert('Position saved.');
+            });
 
         qs("saveSettings").addEventListener("click", () => {
           const st = load();

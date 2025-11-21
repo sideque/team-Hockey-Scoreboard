@@ -1,7 +1,13 @@
 <!doctype html>
 <html lang="en">
+<style>
+    .hide {
+        display: none !important;
+    }
+</style>
 
 <head>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Hockey Scoreboard — Admin</title>
@@ -134,12 +140,12 @@
 
                 <!-- SHOOTOUT TIMER -->
                 <div class="p-4 bg-[#0b0c10] rounded-lg">
-                    <h3 class="text-sm text-gray-300 mb-2">Shootout Timer</h3>
-                    <div class="flex items-center gap-2">
-                        <button id="startShootout" class="px-3 py-2 bg-blue-600 rounded">Start</button>
-                        <button id="pauseShootout" class="px-3 py-2 bg-yellow-500 rounded">Pause</button>
-                        <button id="resetShootoutTimer" class="px-3 py-2 bg-red-600 rounded">Reset</button>
-                        <div id="shootoutClock" class="ml-auto led text-xl font-bold">08:00</div>
+                    <h3 class="text-sm text-gray-300 mb-2">Shootout</h3>
+                        <div class="flex gap-2">
+                      <button id="openShootoutBtn" target="_blank" class="px-3 py-2 rounded bg-[#3B82F6]">Open Shootout</button>
+                        <button id="resetShootout" class="px-3 py-2 rounded bg-[#ef4444]">Reset Shootout</button>
+                        <button id="openDisplay" class="ml-auto px-3 py-2 rounded bg-[#6EE7B7] text-black">Open
+                            Display</button>
                     </div>
 
                     <button id="openShootoutBtn" class="mt-3 px-4 py-2 bg-blue-600 rounded">Open Shootout</button>
@@ -592,14 +598,11 @@
             state = defaultState();
             saveState(state);
             refreshUI();
-        };
+            // auto save from admin UI every 1s to ensure changes persist
+            setInterval(() => saveState(state), 1000);
+        })();
 
-        // SYNC ACROSS TABS
-        window.addEventListener("storage", () => {
-            state = loadState();
-            refreshUI();
-            buildShootout();
-        });
+
 
     </script>
 
