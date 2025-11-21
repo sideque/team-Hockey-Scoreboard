@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Hockey Scoreboard — Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- jsPDF CDN for PDF Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         /* stadium LED vibe */
         .led {
@@ -14,29 +16,24 @@
             letter-spacing: .06em;
             text-shadow: 0 0 6px rgba(59, 130, 246, 0.8), 0 0 18px rgba(59, 130, 246, 0.35);
         }
-
         .glow-green {
             text-shadow: 0 0 8px rgba(110, 231, 183, 0.9);
         }
-
         .glow-red {
             text-shadow: 0 0 8px rgba(239, 68, 68, 0.9);
         }
     </style>
 </head>
-
 <body class="bg-[#0F1117] text-gray-200 min-h-screen">
     <div class="max-w-6xl mx-auto p-6">
         <header class="mb-6">
-            <h1 class="text-2xl font-semibold text-white">Admin Control main— Hockey Scoreboard</h1>
+            <h1 class="text-2xl font-semibold text-white">Admin Control — Hockey Scoreboard</h1>
             <p class="text-sm text-gray-400">Professional stadium LED style. Controls sync to the Display window via
                 localStorage.</p>
         </header>
-
         <!-- MAIN SCOREBOARD CARD -->
         <section class="bg-[#111218] rounded-xl p-6 shadow-lg mb-6">
             <h2 class="text-lg font-medium mb-4">Main Scoreboard</h2>
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <!-- Team A -->
                 <div class="p-4 bg-[#0b0c10] rounded-lg">
@@ -51,11 +48,8 @@
                     <div class="mt-3 flex items-center gap-2">
                         <button id="toggleReferralA" class="px-3 py-1 rounded bg-green-600 text-white text-sm">Referral
                             ✓</button>
-                        <!-- <label class="text-sm text-gray-400">Color: </label>
-                        <input id="colorA" type="color" value="#3B82F6" class="h-8 w-12 p-0" /> -->
                     </div>
                 </div>
-
                 <!-- Timer -->
                 <div class="p-4 bg-[#0b0c10] rounded-lg flex flex-col items-center justify-center text-center">
                     <label class="block text-xs text-gray-400 mb-2">Main Timer</label>
@@ -65,7 +59,6 @@
                         <button id="pauseTimer" class="px-3 py-2 bg-[#F59E0B] text-black rounded">Pause</button>
                         <button id="resetTimer" class="px-3 py-2 bg-[#ef4444] text-white rounded">Reset</button>
                     </div>
-
                     <div class="mt-4 w-full">
                         <label class="block text-xs text-gray-400">Quarter</label>
                         <select id="quarterSelect" class="w-full p-2 rounded bg-[#0f1724] text-sm">
@@ -74,7 +67,6 @@
                             <option value="3">3rd Quarter (15:00)</option>
                             <option value="4">4th Quarter (15:00)</option>
                         </select>
-
                         <label class="block text-xs text-gray-400 mt-2">Break / Warmup</label>
                         <select id="breakSelect" class="w-full p-2 rounded bg-[#0f1724] text-sm">
                             <option value="0">None</option>
@@ -85,7 +77,6 @@
                         </select>
                     </div>
                 </div>
-
                 <!-- Team B -->
                 <div class="p-4 bg-[#0b0c10] rounded-lg">
                     <label class="block text-xs text-gray-400 mb-2">Right Team</label>
@@ -99,12 +90,9 @@
                     <div class="mt-3 flex items-center gap-2">
                         <button id="toggleReferralB" class="px-3 py-1 rounded bg-green-600 text-white text-sm">Referral
                             ✓</button>
-                        <!-- <label class="text-sm text-gray-400">Color: </label>
-                        <input id="colorB" type="color" value="#EF4444" class="h-8 w-12 p-0" /> -->
                     </div>
                 </div>
             </div>
-
             <!-- secondary controls -->
             <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="p-4 bg-[#0b0c10] rounded-lg">
@@ -116,7 +104,6 @@
                         <div id="goalClock" class="ml-auto led text-xl font-bold">00:20</div>
                     </div>
                 </div>
-
                 <div class="p-4 bg-[#0b0c10] rounded-lg">
                     <h3 class="text-sm text-gray-300 mb-2">Penalty Corner Timer</h3>
                     <div class="flex items-center gap-2">
@@ -126,7 +113,6 @@
                         <div id="penaltyClock" class="ml-auto led text-xl font-bold">00:40</div>
                     </div>
                 </div>
-
                 <div class="p-4 bg-[#0b0c10] rounded-lg">
                     <h3 class="text-sm text-gray-300 mb-2">Shootout</h3>
                     <div class="flex gap-2">
@@ -138,15 +124,14 @@
                     </div>
                 </div>
             </div>
-
             <!-- export / import / clear -->
             <div class="mt-6 flex flex-wrap gap-3">
                 <button id="exportJson" class="px-3 py-2 rounded bg-slate-700">Export JSON</button>
                 <label class="px-3 py-2 rounded bg-slate-700 cursor-pointer">
                     Import JSON <input id="importFile" type="file" accept="application/json" class="hidden" />
                 </label>
+                <button id="downloadPDF" class="px-3 py-2 rounded bg-blue-600">Download Scoreboard PDF</button>
                 <button id="clearBtn" class="px-3 py-2 rounded bg-red-600">Clear Saved Data</button>
-
                 <div class="ml-auto flex items-center gap-3">
                     <a href="display.html" target="_blank" class="px-3 py-2 rounded bg-[#111827]">Open Display
                         (window)</a>
@@ -155,11 +140,9 @@
                 </div>
             </div>
         </section>
-
         <footer class="text-sm text-gray-500 mt-6">Tip: Open Display in a separate monitor or browser window for live
             view.</footer>
     </div>
-
     <script>
         /***********************************************
          Shared state structure (stored as JSON in localStorage.key = scoreboardState)
@@ -169,12 +152,11 @@
            mainTimer: { seconds, running },
            goalTimer: { seconds, running },
            penaltyTimer: { seconds, running },
-           shootout: { rounds: [ {a:'-', b:'-'}, ... ], currentRound, scoreA, scoreB, suddenDeath },
+           shootout: { rounds: [ {a:'-', b:'-'}, ... ], currentRound, scoreA, scoreB, suddenDeath, timer: {seconds, running} },
            message: { text },
            lastUpdated: timestamp
          }
         ***********************************************/
-
         (function () {
             // small helper
             const qs = id => document.getElementById(id);
@@ -189,7 +171,6 @@
                 shootout: { rounds: Array(5).fill().map(() => ({ a: '-', b: '-' })), currentRound: 0, scoreA: 0, scoreB: 0, suddenDeath: false },
                 lastUpdated: Date.now()
             });
-
             function loadState() {
                 const raw = localStorage.getItem('scoreboardState');
                 if (!raw) return defaultState();
@@ -199,11 +180,9 @@
                 state.lastUpdated = Date.now();
                 localStorage.setItem('scoreboardState', JSON.stringify(state));
             }
-
             // state & intervals
             let state = loadState();
             saveState(state); // ensure saved
-
             // update UI from state (admin side)
             function refreshUI() {
                 qs('teamAName').value = state.teamA.name || '';
@@ -214,19 +193,18 @@
                 qs('goalClock').textContent = formatTime(state.goalTimer.seconds);
                 qs('penaltyClock').textContent = formatTime(state.penaltyTimer.seconds);
                 qs('quarterSelect').value = String(state.quarter || 1);
-                // qs('colorA').value = state.teamA.color || '#3B82F6';
-                // qs('colorB').value = state.teamB.color || '#EF4444';
                 qs('toggleReferralA').textContent = state.teamA.referral ? 'Referral ✓' : 'Referral ✕';
                 qs('toggleReferralA').classList.toggle('bg-green-600', state.teamA.referral);
                 qs('toggleReferralA').classList.toggle('bg-red-600', !state.teamA.referral);
+                qs('toggleReferralB').textContent = state.teamB.referral ? 'Referral ✓' : 'Referral ✕';
+                qs('toggleReferralB').classList.toggle('bg-green-600', state.teamB.referral);
+                qs('toggleReferralB').classList.toggle('bg-red-600', !state.teamB.referral);
             }
-
             function formatTime(seconds) {
                 if (seconds == null || isNaN(seconds)) seconds = 0;
                 const m = Math.floor(seconds / 60), s = seconds % 60;
                 return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
             }
-
             // timer loop
             let mainInterval = null, goalInterval = null, penaltyInterval = null;
 
@@ -247,7 +225,6 @@
                 if (mainInterval) { clearInterval(mainInterval); mainInterval = null; }
                 qs('mainClock').textContent = formatTime(state.mainTimer.seconds);
             }
-
             function startGoalTimer() {
                 if (goalInterval) return;
                 state.goalTimer.running = true; saveState(state);
@@ -259,7 +236,6 @@
             }
             function pauseGoalTimer() { state.goalTimer.running = false; saveState(state); if (goalInterval) { clearInterval(goalInterval); goalInterval = null; } }
             function resetGoalTimer() { state.goalTimer.seconds = 20; state.goalTimer.running = false; saveState(state); qs('goalClock').textContent = formatTime(state.goalTimer.seconds); }
-
             function startPenaltyTimer() {
                 if (penaltyInterval) return;
                 state.penaltyTimer.running = true; saveState(state);
@@ -274,22 +250,15 @@
 
             // hooter (audio)
             function playHooter() { try { new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=').play(); } catch (e) { } }
-
             // event bindings
             qs('teamAInc').addEventListener('click', () => { state.teamA.score = Math.min(99, state.teamA.score + 1); saveState(state); refreshUI(); });
             qs('teamADec').addEventListener('click', () => { state.teamA.score = Math.max(0, state.teamA.score - 1); saveState(state); refreshUI(); });
             qs('teamBInc').addEventListener('click', () => { state.teamB.score = Math.min(99, state.teamB.score + 1); saveState(state); refreshUI(); });
             qs('teamBDec').addEventListener('click', () => { state.teamB.score = Math.max(0, state.teamB.score - 1); saveState(state); refreshUI(); });
-
             qs('teamAName').addEventListener('input', (e) => { state.teamA.name = e.target.value; saveState(state); });
             qs('teamBName').addEventListener('input', (e) => { state.teamB.name = e.target.value; saveState(state); });
-
             qs('toggleReferralA').addEventListener('click', () => { state.teamA.referral = !state.teamA.referral; saveState(state); refreshUI(); });
             qs('toggleReferralB').addEventListener('click', () => { state.teamB.referral = !state.teamB.referral; saveState(state); refreshUI(); });
-
-            // qs('colorA').addEventListener('change', (e) => { state.teamA.color = e.target.value; saveState(state); });
-            // qs('colorB').addEventListener('change', (e) => { state.teamB.color = e.target.value; saveState(state); });
-
             qs('startTimer').addEventListener('click', () => startMainTimer());
             qs('pauseTimer').addEventListener('click', () => pauseMainTimer());
             qs('resetTimer').addEventListener('click', () => resetMainTimer(15 * 60));
@@ -303,7 +272,6 @@
                 const seconds = v.includes('-') ? parseInt(v.split('-')[0]) : parseInt(v);
                 state.mainTimer.seconds = seconds; state.mainTimer.running = false; saveState(state); refreshUI();
             });
-
             qs('startGoal').addEventListener('click', () => startGoalTimer());
             qs('pauseGoal').addEventListener('click', () => pauseGoalTimer());
             qs('resetGoal').addEventListener('click', () => resetGoalTimer());
@@ -315,7 +283,6 @@
             qs('openDisplay').addEventListener('click', () => {
                 window.open('display.html', 'ScoreboardDisplay', 'width=1200,height=700');
             });
-
             qs('resetShootout').addEventListener('click', () => {
                 if (!confirm('Reset shootout results?')) return;
                 state.shootout = { rounds: Array(5).fill().map(() => ({ a: '-', b: '-' })), currentRound: 0, scoreA: 0, scoreB: 0, suddenDeath: false };
@@ -328,7 +295,6 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a'); a.href = url; a.download = 'scoreboardState.json'; a.click(); URL.revokeObjectURL(url);
             });
-
             qs('importFile').addEventListener('change', (ev) => {
                 const f = ev.target.files[0];
                 if (!f) return;
@@ -342,14 +308,56 @@
                 };
                 reader.readAsText(f);
             });
-
+            // PDF Download - NEW
+            qs('downloadPDF').addEventListener('click', () => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Title
+                doc.setFontSize(20);
+                doc.text('Hockey Scoreboard Report', 105, 20, { align: 'center' });
+                
+                // Teams & Scores
+                doc.setFontSize(16);
+                let quarterText = state.phase === 'play' ? 
+                    `${state.quarter || 1}${[null,'st','nd','rd','th'][state.quarter || 1]} Quarter` : 
+                    (state.phaseDetail || 'Break');
+                doc.text(`Phase: ${quarterText}`, 20, 50);
+                doc.text(`${state.teamA.name || 'Team A'}: ${state.teamA.score || 0}`, 20, 70);
+                doc.text(`${state.teamB.name || 'Team B'}: ${state.teamB.score || 0}`, 20, 90);
+                
+                // Timers
+                doc.text('Main Timer: ' + formatTime(state.mainTimer.seconds), 20, 110);
+                doc.text('Goal Timer: ' + formatTime(state.goalTimer.seconds), 20, 130);
+                doc.text('Penalty Timer: ' + formatTime(state.penaltyTimer.seconds), 20, 150);
+                
+                // Referrals
+                doc.text(`Team A Referral: ${state.teamA.referral ? 'Yes' : 'No'}`, 20, 170);
+                doc.text(`Team B Referral: ${state.teamB.referral ? 'Yes' : 'No'}`, 20, 190);
+                
+                // Shootout
+                if (state.shootout) {
+                    doc.text(`Shootout: ${state.shootout.scoreA || 0} - ${state.shootout.scoreB || 0}`, 20, 210);
+                    doc.text('Shootout Timer: ' + formatTime(state.shootout.timer?.seconds || 8), 20, 230);
+                }
+                
+                // Message
+                if (state.message?.text) {
+                    doc.setFontSize(12);
+                    doc.text('Message: ' + state.message.text, 20, 250, { maxWidth: 170 });
+                }
+                
+                // Generate & Download
+                const today = new Date().toISOString().split('T')[0];
+                doc.save(`scoreboard-${today}.pdf`);
+                alert('PDF Downloaded!');
+            });
             qs('clearBtn').addEventListener('click', () => {
                 if (!confirm('This will clear ALL scoreboard data (scores, timers, settings). Proceed?')) return;
                 localStorage.removeItem('scoreboardState');
                 state = defaultState(); saveState(state); refreshUI();
                 alert('Cleared.');
             });
-
             // keep admin UI in sync if external display or other tab changed
             window.addEventListener('storage', (e) => {
                 if (e.key === 'scoreboardState') {
@@ -357,15 +365,11 @@
                     refreshUI();
                 }
             });
-
             // initialize
             refreshUI();
-
             // auto save from admin UI every 1s to ensure changes persist
             setInterval(() => saveState(state), 1000);
-
         })();
     </script>
 </body>
-
 </html>
