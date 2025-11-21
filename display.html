@@ -46,6 +46,7 @@
 </head>
 
 <body class="min-h-screen relative">
+  <audio id="beepSound" src="src/beep.mp3.wav" preload="auto"></audio>
 
   <div class="msgBox text-left text-white/90" id="messageBox"></div>
 
@@ -96,7 +97,7 @@
         <div class="text-white led" id="displaySOScore">0 - 0</div>
       </div>
 
-      <div id="soGrid" class="mt-4 grid grid-cols-11 gap-2 items-center">
+      <div id="soGrid" class="mt-4 grid grid-cols-12 gap-2 items-center">
         <!-- layout: label, 5 A cells, separator, 5 B cells -->
       </div>
     </div>
@@ -154,6 +155,39 @@
           prev.refB = st.teamB.referral;
         }
 
+
+//         // BEEP + AUTO RESET WHEN TIMER HITS 00:00
+// if (st.mainTimer.seconds === 0 && prev.mainBeep !== true) {
+//   const beep = document.getElementById("beepSound");
+//   beep.currentTime = 0;
+//   beep.play();
+//   prev.mainBeep = true;
+
+//   // Reset timer to 15:00 (900 seconds)
+//   st.mainTimer.seconds = 900;
+
+//   // Save back to localStorage so render picks it up
+//   localStorage.setItem('scoreboardState', JSON.stringify(st));
+// }
+
+// // Allow beep again once timer is running
+// if (st.mainTimer.seconds > 0) {
+//   prev.mainBeep = false;
+// }
+
+
+        // BEEP WHEN TIMER HITS 00:00
+   if (st.mainTimer.seconds === 0 && prev.mainBeep !== true) {
+  const beep = document.getElementById("beepSound");
+  beep.currentTime = 0; // rewind sound to start
+  beep.play();           // play beep
+  prev.mainBeep = true;  // mark that beep has been played
+}
+
+// Reset for next period
+if (st.mainTimer.seconds > 0) {
+  prev.mainBeep = false; // allows beep to play next time timer hits 0
+}
         // main clock
         if (prev.main !== st.mainTimer.seconds) {
           qs('displayMainClock').textContent = formatTime(st.mainTimer.seconds || 0);
