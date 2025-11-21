@@ -1,49 +1,109 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Custom Message</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Custom Scoreboard Message</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#071025] text-white p-6">
-  <div class="max-w-xl mx-auto">
-    <h1 class="text-xl font-semibold mb-4">Custom Message</h1>
-    <textarea id="msg" rows="4" class="w-full p-3 rounded bg-[#0f1724]"></textarea>
-    <div class="mt-4 flex gap-3">
-      <button id="showBtn" class="px-3 py-2 rounded bg-[#3B82F6]">Display on Scoreboard</button>
-      <button id="clearBtn" class="px-3 py-2 rounded bg-red-600">Clear Message</button>
-      <button id="blinkBtn" class="ml-auto px-3 py-2 rounded bg-slate-700">Test Blink</button>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+  <div class="max-w-md w-full space-y-4">
+    <h1 class="text-2xl font-bold text-center">Custom Message Admin</h1>
+    <textarea 
+      id="messageInput" 
+      rows="4" 
+      placeholder="Enter your custom message here..."
+      class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+    ></textarea>
+    <div class="flex flex-col sm:flex-row gap-2">
+      <button 
+        id="displayBtn" 
+        class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
+      >
+        Display on Scoreboard
+      </button>
+      <button 
+        id="clearBtn" 
+        class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors"
+      >
+        Clear Message
+      </button>
     </div>
-    <p class="mt-4 text-gray-400 text-sm">Message will be displayed top left on the Display page.</p>
+    <!-- Optional Blink Toggle -->
+    <label class="flex items-center space-x-2">
+      <input type="checkbox" id="blinkToggle" class="rounded">
+      <span class="text-sm text-gray-300">Enable Blink Mode</span>
+    </label>
+    <p class="text-xs text-gray-400 text-center">Changes save to localStorage and update the display page automatically.</p>
   </div>
 
-<script>
-(function(){
-  const qs = id => document.getElementById(id);
-  function load(){ try{ return JSON.parse(localStorage.getItem('scoreboardState'))|| {}; }catch(e){ return {}; } }
-  function save(st){ localStorage.setItem('scoreboardState', JSON.stringify(st)); }
+  <script>
+    // Helper to get element by ID
+    const getEl = (id) => document.getElementById(id);
 
-  qs('showBtn').addEventListener('click', ()=>{
-    const st = load();
-    st.message = { text: qs('msg').value || '' };
-    save(st);
-    alert('Message updated.');
-  });
+    // Load state from localStorage, default to empty object if error
+    const loadState = () => {
+      try {
+        return JSON.parse(localStorage.getItem('scoreboardState')) || {};
+      } catch (e) {
+        console.warn('Failed to load state:', e);
+        return {};
+      }
+    };
 
-  qs('clearBtn').addEventListener('click', ()=> {
-    const st = load(); st.message = { text: '' }; save(st); qs('msg').value='';
-    alert('Message cleared.');
-  });
+    // Save state to localStorage
+    const saveState = (state) => {
+      try {
+        localStorage.setItem('scoreboardState', JSON.stringify(state));
+      } catch (e) {
+        console.warn('Failed to save state:', e);
+      }
+    };
 
-  qs('blinkBtn').addEventListener('click', ()=>{
-    // small visual test: toggle message briefly
-    const st = load(); const previous = st.message ? st.message.text : '';
-    st.message = { text: '*** HOOKER TEST ***' }; save(st);
-    setTimeout(()=> { st.message = { text: previous }; save(st); }, 1200);
-  });
+    // Event listener for Display button
+    getEl('displayBtn').addEventListener('click', () => {
+      const state = loadState();
+      const messageText = getEl('messageInput').value.trim();
+      const blinkEnabled = getEl('blinkToggle').checked;
+      
+      state.message = {
+        text: messageText,
+        blink: blinkEnabled
+      };
+      
+      saveState(state);
+      // Optional: Visual feedback
+      getEl('displayBtn').textContent = 'Updated!';
+      setTimeout(() => {
+        getEl('displayBtn').textContent = 'Display on Scoreboard';
+      }, 1000);
+    });
 
-})();
-</script>
+    // Event listener for Clear button
+    getEl('clearBtn').addEventListener('click', () => {
+      const state = loadState();
+      state.message = null; // Set to null to indicate no message
+      saveState(state);
+      getEl('messageInput').value = '';
+      getEl('blinkToggle').checked = false;
+      // Optional: Visual feedback
+      getEl('clearBtn').textContent = 'Cleared!';
+      setTimeout(() => {
+        getEl('clearBtn').textContent = 'Clear Message';
+      }, 1000);
+    });
+
+    // Load current state on page load to sync UI
+    const initUI = () => {
+      const state = loadState();
+      if (state.message) {
+        getEl('messageInput').value = state.message.text || '';
+        getEl('blinkToggle').checked = state.message.blink || false;
+      }
+    };
+
+    // Initialize on load
+    initUI();
+  </script>
 </body>
 </html>

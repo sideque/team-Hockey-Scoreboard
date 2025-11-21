@@ -5,7 +5,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Hockey Scoreboard — Display</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     body {
       background: linear-gradient(180deg, #0F1117, #0B0C10);
@@ -35,196 +36,208 @@
       font-size: 14px;
     }
 
-    .msgBox {
-      position: absolute;
-      left: 20px;
-      top: 20px;
-      max-width: 40%;
-      font-size: clamp(12px, 1.4vw, 22px);
+    /* -------------------- FULL-SCREEN MESSAGE OVERLAY -------------------- */
+    #fullScreenMessage {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(180deg, #0F1117, #0B0C10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: all 0.4s ease;
+      font-size: clamp(2rem, 10vw, 12rem);
+      font-family: ui-monospace, "Roboto Mono", monospace;
+      font-weight: font-black;
+      text-align: center;
+      padding: 2rem;
+      box-sizing: border-box;
+      color: #fff;
+      letter-spacing: 0.1em;
+      text-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.8), 
+        0 0 40px rgba(59, 130, 246, 0.6), 
+        0 0 60px rgba(59, 130, 246, 0.3);
+    }
+
+    #fullScreenMessage.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Blink Animation */
+    .blink {
+      animation: blinkEffect 1s infinite;
+    }
+
+    @keyframes blinkEffect {
+      0% { opacity: 1; }
+      50% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    /* Hide scoreboard when message is active */
+    .scoreboard-content.hidden {
+      display: none !important;
     }
   </style>
 </head>
 
 <body class="min-h-screen relative">
 
-  <div class="msgBox text-left text-white/90" id="messageBox"></div>
+  <!-- FULL-SCREEN MESSAGE OVERLAY -->
+  <div id="fullScreenMessage" class="hidden"></div>
 
-  <div class="max-w-7xl mx-auto py-8 px-4">
-    <!-- <div class="w-full mb-6">
-      <iframe id="liveVideo" width="100%" height="360" class="rounded-lg shadow-lg"
-        src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1" allow="autoplay; encrypted-media"
-        allowfullscreen>
-      </iframe>
-    </div> -->
+  <!-- SCOREBOARD CONTENT -->
+  <div id="scoreboardContent" class="scoreboard-content">
+    <div class="max-w-7xl mx-auto py-8 px-4">
 
-    <div class="grid grid-cols-12 gap-6 items-center">
-      <!-- Team A -->
-      <div class="col-span-3 bg-transparent text-left">
-        <div id="displayTeamAName" class="teamName">TEAM A</div>
-        <div id="displayTeamAScore" class="text-7xl led font-black mt-4">00</div>
-        <div id="displayReferralA" class="mt-4 referral bg-green-600 text-black">Referral</div>
-      </div>
+      <div class="grid grid-cols-12 gap-6 items-center">
 
-      <!-- Center Timer -->
-      <div class="col-span-6 text-center">
-        <div id="displayQuarter" class="text-sm text-gray-400 mb-2">1st Quarter</div>
-        <div id="displayMainClock" class="big-timer led font-extrabold">15:00</div>
-        <div class="mt-4 flex justify-center gap-6">
-          <div class="text-center">
-            <div class="text-xs text-gray-400">Goal Timer</div>
-            <div id="displayGoal" class="led text-2xl">00:20</div>
+        <!-- Team A -->
+        <div class="col-span-3 bg-transparent text-left">
+          <div id="displayTeamAName" class="teamName">TEAM A</div>
+          <div id="displayTeamAScore" class="text-7xl led font-black mt-4">00</div>
+          <div id="displayReferralA" class="mt-4 referral bg-green-600 text-black">Referral</div>
+        </div>
+
+        <!-- Center -->
+        <div class="col-span-6 text-center">
+          <div id="displayQuarter" class="text-sm text-gray-400 mb-2">1st Quarter</div>
+          <div id="displayMainClock" class="big-timer led font-extrabold">15:00</div>
+
+          <div class="mt-4 flex justify-center gap-6">
+            <div class="text-center">
+              <div class="text-xs text-gray-400">Goal Timer</div>
+              <div id="displayGoal" class="led text-2xl">00:20</div>
+            </div>
+            <div class="text-center">
+              <div class="text-xs text-gray-400">Penalty Timer</div>
+              <div id="displayPenalty" class="led text-2xl">00:40</div>
+            </div>
           </div>
-          <div class="text-center">
-            <div class="text-xs text-gray-400">Penalty Timer</div>
-            <div id="displayPenalty" class="led text-2xl">00:40</div>
-          </div>
+        </div>
+
+        <!-- Team B -->
+        <div class="col-span-3 text-right">
+          <div id="displayTeamBName" class="teamName">TEAM B</div>
+          <div id="displayTeamBScore" class="text-7xl led font-black mt-4">00</div>
+          <div id="displayReferralB" class="mt-4 referral bg-green-600 text-black">Referral</div>
         </div>
       </div>
 
-      <!-- Team B -->
-      <div class="col-span-3 text-right">
-        <div id="displayTeamBName" class="teamName">TEAM B</div>
-        <div id="displayTeamBScore" class="text-7xl led font-black mt-4">00</div>
-        <div id="displayReferralB" class="mt-4 referral bg-green-600 text-black">Referral</div>
-      </div>
-    </div>
+      <!-- SHOOTOUT -->
+      <div class="mt-8 bg-[#081226] p-4 rounded-lg">
+        <div class="flex items-center justify-between">
+          <div class="text-gray-400">Shootout</div>
+          <div class="text-white led" id="displaySOScore">0 - 0</div>
+        </div>
 
-    <!-- Shootout preview -->
-    <div class="mt-8 bg-[#081226] p-4 rounded-lg">
-      <div class="flex items-center justify-between">
-        <div class="text-gray-400">Shootout</div>
-        <div class="text-white led" id="displaySOScore">0 - 0</div>
-      </div>
-
-      <div id="soGrid" class="mt-4 grid grid-cols-11 gap-2 items-center">
-        <!-- layout: label, 5 A cells, separator, 5 B cells -->
+        <div id="soGrid" class="mt-4 grid grid-cols-12 gap-2 items-center"></div>
       </div>
     </div>
   </div>
 
+  <!-- SCRIPT -->
   <script>
     (function () {
       const qs = id => document.getElementById(id);
-      function loadState() { try { return JSON.parse(localStorage.getItem('scoreboardState')) || {}; } catch (e) { return {}; } }
-      function formatTime(s) { const m = Math.floor(s / 60), sec = s % 60; return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`; }
 
-      // track previous values to avoid re-render
-      let prev = {};
+      function load() {
+        try { return JSON.parse(localStorage.getItem("scoreboardState")) || {}; }
+        catch { return {}; }
+      }
 
-      function render() {
-        const st = loadState();
-        if (!st.teamA) return;
-        // Team names
-        if (prev.teamAName !== st.teamA.name) {
-          qs('displayTeamAName').textContent = st.teamA.name || '';
-          prev.teamAName = st.teamA.name;
-        }
-        if (prev.teamBName !== st.teamB.name) {
-          qs('displayTeamBName').textContent = st.teamB.name || '';
-          prev.teamBName = st.teamB.name;
-        }
+      const fullScreenMsg = qs("fullScreenMessage");
+      const scoreboardContent = qs("scoreboardContent");
 
-        // Scores
-        if (prev.scoreA !== st.teamA.score) {
-          qs('displayTeamAScore').textContent = String(st.teamA.score || 0).padStart(2, '0');
-          prev.scoreA = st.teamA.score;
-        }
-        if (prev.scoreB !== st.teamB.score) {
-          qs('displayTeamBScore').textContent = String(st.teamB.score || 0).padStart(2, '0');
-          prev.scoreB = st.teamB.score;
-        }
+      function formatTime(seconds) {
+        if (seconds == null || isNaN(seconds)) seconds = 0;
+        const m = Math.floor(seconds / 60), s = seconds % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      }
 
-        // Colors & referral
-        if (prev.colorA !== st.teamA.color) {
-          qs('displayTeamAScore').style.color = st.teamA.color || '#fff';
-          prev.colorA = st.teamA.color;
-        }
-        if (prev.colorB !== st.teamB.color) {
-          qs('displayTeamBScore').style.color = st.teamB.color || '#fff';
-          prev.colorB = st.teamB.color;
-        }
-        if (prev.refA !== st.teamA.referral) {
-          qs('displayReferralA').textContent = st.teamA.referral ? 'Referral' : 'No Referral';
-          qs('displayReferralA').className = (st.teamA.referral ? 'referral bg-green-400 text-black' : 'referral bg-red-600 text-white');
-          prev.refA = st.teamA.referral;
-        }
-        if (prev.refB !== st.teamB.referral) {
-          qs('displayReferralB').textContent = st.teamB.referral ? 'Referral' : 'No Referral';
-          qs('displayReferralB').className = (st.teamB.referral ? 'referral bg-green-400 text-black' : 'referral bg-red-600 text-white');
-          prev.refB = st.teamB.referral;
-        }
+      function getQuarterText(quarter) {
+        const suffixes = ['', 'st', 'nd', 'rd', 'th'];
+        return `${quarter}${suffixes[quarter] || 'th'} Quarter`;
+      }
 
-        // main clock
-        if (prev.main !== st.mainTimer.seconds) {
-          qs('displayMainClock').textContent = formatTime(st.mainTimer.seconds || 0);
-          prev.main = st.mainTimer.seconds;
-        }
+      function updateDisplay() {
+        const st = load();
 
-        // quarter label
-        if (prev.quarter !== st.quarter) {
-          const qlbl = (st.quarter || 1) + ((st.quarter == 1) ? 'st' : (st.quarter == 2 ? 'nd' : (st.quarter == 3 ? 'rd' : 'th'))) + ' Quarter';
-          qs('displayQuarter').textContent = qlbl;
-          prev.quarter = st.quarter;
-        }
+        // Update Message (full-screen if present)
+        const text = st.message?.text || "";
+        if (text.trim()) {
+          // Hide scoreboard, show message
+          scoreboardContent.classList.add("hidden");
+          fullScreenMsg.classList.remove("hidden");
+          fullScreenMsg.textContent = text;
+          requestAnimationFrame(() => fullScreenMsg.classList.add("show"));
 
-        // goal / penalty
-        if (prev.goal !== st.goalTimer.seconds) {
-          qs('displayGoal').textContent = formatTime(st.goalTimer.seconds || 0);
-          prev.goal = st.goalTimer.seconds;
-        }
-        if (prev.penalty !== st.penaltyTimer.seconds) {
-          qs('displayPenalty').textContent = formatTime(st.penaltyTimer.seconds || 0);
-          prev.penalty = st.penaltyTimer.seconds;
-        }
-
-        // message
-        if (prev.msg !== st.message.text) {
-          qs('messageBox').textContent = st.message.text || '';
-          prev.msg = st.message.text;
-        }
-
-        // shootout grid
-        const so = st.shootout || { rounds: [] };
-        const soGrid = qs('soGrid');
-        // only rebuild if changed length/rounds
-        if (JSON.stringify(prev.so) !== JSON.stringify(so)) {
-          prev.so = JSON.parse(JSON.stringify(so));
-          soGrid.innerHTML = '';
-          // labels
-          const label = document.createElement('div'); label.className = 'text-gray-400 col-span-1'; label.textContent = 'Rounds'; soGrid.appendChild(label);
-          // A cells
-          for (let i = 0; i < 5; i++) {
-            const c = document.createElement('div'); c.className = 'col-span-1 text-center py-1';
-            c.innerHTML = `<div class="text-sm text-gray-300">A${i + 1}</div><div class="text-2xl led">${so.rounds[i] ? (so.rounds[i].a || '-') : '-'}</div>`;
-            soGrid.appendChild(c);
+          // Blink if enabled in message state
+          if (st.message?.blink) {
+            fullScreenMsg.classList.add("blink");
+          } else {
+            fullScreenMsg.classList.remove("blink");
           }
-          // separator
-          const sep = document.createElement('div'); sep.className = 'col-span-1 text-center text-gray-400'; sep.textContent = 'vs'; soGrid.appendChild(sep);
-          // B cells
-          for (let i = 0; i < 5; i++) {
-            const c = document.createElement('div'); c.className = 'col-span-1 text-center py-1';
-            c.innerHTML = `<div class="text-sm text-gray-300">B${i + 1}</div><div class="text-2xl led">${so.rounds[i] ? (so.rounds[i].b || '-') : '-'}</div>`;
-            soGrid.appendChild(c);
-          }
+          return;
+        } else {
+          // No message: Show scoreboard, hide message
+          fullScreenMsg.classList.remove("show", "blink");
+          fullScreenMsg.classList.add("hidden");
+          scoreboardContent.classList.remove("hidden");
         }
 
-        // shootout score display
-        const scoreA = (st.shootout && st.shootout.scoreA) || 0;
-        const scoreB = (st.shootout && st.shootout.scoreB) || 0;
-        if (prev.soScore !== `${scoreA}-${scoreB}`) {
-          qs('displaySOScore').textContent = `${scoreA} - ${scoreB}`;
-          prev.soScore = `${scoreA}-${scoreB}`;
+        // Update Scoreboard Elements
+        qs("displayTeamAName").textContent = st.teamA?.name || "TEAM A";
+        qs("displayTeamBName").textContent = st.teamB?.name || "TEAM B";
+        qs("displayTeamAScore").textContent = String(st.teamA?.score || 0).padStart(2, '0');
+        qs("displayTeamBScore").textContent = String(st.teamB?.score || 0).padStart(2, '0');
+        qs("displayMainClock").textContent = formatTime(st.mainTimer?.seconds || 900);
+        qs("displayGoal").textContent = formatTime(st.goalTimer?.seconds || 20);
+        qs("displayPenalty").textContent = formatTime(st.penaltyTimer?.seconds || 40);
+        qs("displayQuarter").textContent = getQuarterText(st.quarter || 1);
+        qs("displaySOScore").textContent = `${st.shootout?.scoreA || 0} - ${st.shootout?.scoreB || 0}`;
+
+        // Update Referrals (show/hide based on state)
+        const refA = qs("displayReferralA");
+        const refB = qs("displayReferralB");
+        if (st.teamA?.referral) {
+          refA.style.display = "block";
+          refA.className = "mt-4 referral bg-green-600 text-black";
+        } else {
+          refA.style.display = "none";
+        }
+        if (st.teamB?.referral) {
+          refB.style.display = "block";
+          refB.className = "mt-4 referral bg-green-600 text-black";
+        } else {
+          refB.style.display = "none";
+        }
+
+        // Shootout Grid (basic: clear and add rounds if present; minimal for now)
+        const soGrid = qs("soGrid");
+        soGrid.innerHTML = ""; // Clear
+        if (st.shootout?.rounds) {
+          st.shootout.rounds.slice(0, 5).forEach((round, idx) => {
+            const cell = document.createElement("div");
+            cell.className = "col-span-1 text-center text-sm led";
+            cell.textContent = `${round.a} - ${round.b}`;
+            soGrid.appendChild(cell);
+          });
         }
       }
 
-      // poll localStorage every 250ms (lightweight) and only update differences
-      setInterval(render, 250);
-
-      // initial
-      render();
-
+      // Poll every 500ms for live updates
+      setInterval(updateDisplay, 500);
+      updateDisplay(); // Initial load
     })();
   </script>
-</body>
 
+</body>
 </html>
