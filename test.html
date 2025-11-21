@@ -221,6 +221,9 @@ index.html files
                 qs('toggleReferralA').textContent = state.teamA.referral ? 'Referral ✓' : 'Referral ✕';
                 qs('toggleReferralA').classList.toggle('bg-green-600', state.teamA.referral);
                 qs('toggleReferralA').classList.toggle('bg-red-600', !state.teamA.referral);
+                 qs('toggleReferralB').textContent = state.teamB.referral ? 'Referral ✓' : 'Referral ✕';
+                qs('toggleReferralB').classList.toggle('bg-green-600', state.teamB.referral);
+                qs('toggleReferralB').classList.toggle('bg-red-600', !state.teamB.referral);
             }
 
             function formatTime(seconds) {
