@@ -12,6 +12,18 @@
 <body class="bg-[#071022] text-white p-6">
   <div class="max-w-3xl mx-auto">
     <h1 class="text-xl font-semibold mb-4">Shootout Control</h1>
+    
+    <!-- Shootout Timer -->
+    <div class="mb-6 p-4 bg-[#0b0c10] rounded-lg">
+      <h3 class="text-sm text-gray-300 mb-2">Shootout Timer</h3>
+      <div class="flex items-center gap-2">
+        <button id="startShootout" class="px-3 py-2 rounded bg-[#3B82F6]">Start</button>
+        <button id="pauseShootout" class="px-3 py-2 rounded bg-[#F59E0B]">Pause</button>
+        <button id="resetShootoutTimer" class="px-3 py-2 rounded bg-[#ef4444]">Reset</button>
+        <div id="shootoutClock" class="ml-auto led text-2xl font-bold">08:00</div>
+      </div>
+    </div>
+
     <div class="grid grid-cols-12 gap-2 items-center">
       <div class="text-gray-400">Round</div>
       <div class="text-center">A1</div><div class="text-center">A2</div><div class="text-center">A3</div><div class="text-center">A4</div><div class="text-center">A5</div>
@@ -36,7 +48,62 @@
 
   let st = load();
   if (!st.shootout) st.shootout = { rounds:Array(5).fill().map(()=>({a:'-',b:'-'})), currentRound:0, scoreA:0, scoreB:0, suddenDeath:false };
+  if (!st.shootoutTimer) st.shootoutTimer = { seconds: 8 * 60, running: false };
   save(st);
+
+  // Shootout Timer Functions
+  let shootoutInterval = null;
+  function formatTime(seconds) {
+    if (seconds == null || isNaN(seconds)) seconds = 0;
+    const m = Math.floor(seconds / 60), s = seconds % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  function startShootoutTimer() {
+    if (shootoutInterval) return;
+    if (!st.shootoutTimer) st.shootoutTimer = { seconds: 8 * 60, running: false };
+    st.shootoutTimer.running = true; save(st);
+    shootoutInterval = setInterval(() => {
+      if (!st.shootoutTimer.running) { clearInterval(shootoutInterval); shootoutInterval = null; return; }
+      if (st.shootoutTimer.seconds > 0) { 
+        st.shootoutTimer.seconds -= 1; 
+        save(st); 
+        qs('shootoutClock').textContent = formatTime(st.shootoutTimer.seconds); 
+      } else { 
+        st.shootoutTimer.running = false; 
+        save(st); 
+        clearInterval(shootoutInterval); 
+        shootoutInterval = null; 
+        // Play hooter sound
+        try { 
+          new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=').play(); 
+        } catch (e) {} 
+      }
+    }, 1000);
+  }
+
+  function pauseShootoutTimer() { 
+    if (!st.shootoutTimer) st.shootoutTimer = { seconds: 8 * 60, running: false };
+    st.shootoutTimer.running = false; 
+    save(st); 
+    if (shootoutInterval) { clearInterval(shootoutInterval); shootoutInterval = null; } 
+  }
+
+  function resetShootoutTimer() { 
+    if (!st.shootoutTimer) st.shootoutTimer = { seconds: 8 * 60, running: false };
+    st.shootoutTimer.seconds = 8 * 60; 
+    st.shootoutTimer.running = false; 
+    save(st); 
+    qs('shootoutClock').textContent = formatTime(st.shootoutTimer.seconds); 
+  }
+
+  // Initialize timer display
+  qs('shootoutClock').textContent = formatTime(st.shootoutTimer?.seconds || 8 * 60);
+
+  // Timer event listeners
+  qs('startShootout').addEventListener('click', startShootoutTimer);
+  qs('pauseShootout').addEventListener('click', pauseShootoutTimer);
+  qs('resetShootoutTimer').addEventListener('click', resetShootoutTimer);
 
   function build(){
     const grid = qs('grid'); grid.innerHTML='';
@@ -124,7 +191,13 @@
   }
 
   // listen storage changes (if admin modified other tabs)
-  window.addEventListener('storage', ()=>{ st = load(); build(); });
+  window.addEventListener('storage', ()=>{ 
+    st = load(); 
+    build(); 
+    if (st.shootoutTimer) {
+      qs('shootoutClock').textContent = formatTime(st.shootoutTimer.seconds);
+    }
+  });
 
   build();
 

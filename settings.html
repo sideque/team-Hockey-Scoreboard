@@ -20,7 +20,7 @@
             </div>
             <div class="mt-3 flex gap-2">
                 <button id="applyPresets" class="px-3 py-2 rounded bg-[#3B82F6]">Apply</button>
-                <button id="backButton" class="px-3 py-2 rounded bg-slate-700">Back</button>
+                <button id="backButton" class="px-3 py-2 rounded bg-slate-700">Back to Admin</button>
             </div>
             
         </div>
@@ -45,7 +45,7 @@
 
 
         <div class="mt-6 flex gap-3">
-            <button id="resetAll" class="px-3 py-2 rounded bg-red-600">Reset All</button>
+            <button id="resetAll" class="px-3 py-2 rounded bg-red-600">NEW MATCH</button>
             <button id="saveSettings" class="px-3 py-2 rounded bg-slate-700">Save Settings</button>
         </div>
     </div>
@@ -99,9 +99,9 @@
             });
 
             qs('resetAll').addEventListener('click', () => {
-                if (!confirm('Reset entire scoreboard (all data)?')) return;
+                if (!confirm('Reset entire scoreboard for a new match (all data)?')) return;
                 localStorage.removeItem('scoreboardState'); 
-                alert('Reset done.');
+                alert('New match started. Scoreboard reset.');
                 location.reload(); 
             });
 

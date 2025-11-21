@@ -1536,10 +1536,8 @@ admin.js file ----------------------
               quarterSelect.value = localStorage.getItem('quarter') || quarterSelect.value;
               mainSeconds = parseInt(localStorage.getItem('main_timer_seconds') || mainLength.value, 10);
               mainTimerDisplay.textContent = localStorage.getItem('main_timer_display') || fmt(mainSeconds);
-              refA.className = localStorage.getItem('refA_status') === 'lost' ? 'px-3 py-2 bg-red-600 rounded' : 'px-3 py-2
-              bg - green - 600 rounded';
-              refB.className = localStorage.getItem('refB_status') === 'lost' ? 'px-3 py-2 bg-red-600 rounded' : 'px-3 py-2
-              bg - green - 600 rounded';
+              refA.className = localStorage.getItem('refA_status') === 'lost' ? 'px-3 py-2 bg-red-600 rounded' : 'px-3 py-2 bg-green-600 rounded';
+              refB.className = localStorage.getItem('refB_status') === 'lost' ? 'px-3 py-2 bg-red-600 rounded' : 'px-3 py-2 bg-green-600 rounded';
           }
           function saveState() {
               localStorage.setItem('scoreA', scoreA.textContent); localStorage.setItem('scoreB',
@@ -1603,12 +1601,10 @@ admin.js file ----------------------
 
           refA.addEventListener('click', () => {
               const lost = localStorage.getItem('refA_status') === 'lost';
-              localStorage.setItem('refA_status', lost ? 'available' : 'lost'); refA.className = lost ? 'px-3 py-2 bg-green-600
-  rounded' : 'px - 3 py - 2 bg - red - 600 rounded'; });
+              localStorage.setItem('refA_status', lost ? 'available' : 'lost'); refA.className = lost ? 'px-3 py-2 bg-green-600 rounded' : 'px-3 py-2 bg-red-600 rounded'; });
               refB.addEventListener('click', () => {
                   const lost = localStorage.getItem('refB_status') === 'lost';
-                  localStorage.setItem('refB_status', lost ? 'available' : 'lost'); refB.className = lost ? 'px-3 py-2 bg-green-600
-  rounded' : 'px - 3 py - 2 bg - red - 600 rounded'; });
+                  localStorage.setItem('refB_status', lost ? 'available' : 'lost'); refB.className = lost ? 'px-3 py-2 bg-green-600 rounded' : 'px-3 py-2 bg-red-600 rounded'; });
 
                   openDisplay.addEventListener('click', () => {
                       window.open('display.html', 'scoreboard-display',
